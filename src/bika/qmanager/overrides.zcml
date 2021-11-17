@@ -7,7 +7,7 @@
   <include package=".adapters"/>
   <include package=".browser" />
   <include file="adapters/overrides.zcml" />
-  <include file="browser/overrides/overrides.zcml" />
+  <include file="browser/overrides.zcml" />
 
 </configure>
 
