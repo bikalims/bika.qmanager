@@ -17,8 +17,7 @@
       name="ajax_ar_add"
       class="bika.qmanager.browser.analysisrequest.add.ajaxAnalysisRequestAddView"
       permission="zope.Public"
-      layer="bika.lims.interfaces.IBikaLIMS"
-      />
+      layer="senaite.queue.interfaces.ISenaiteQueueLayer" />
 
   <!-- Ajax Publish View : ajax_publish -->
   <browser:page
