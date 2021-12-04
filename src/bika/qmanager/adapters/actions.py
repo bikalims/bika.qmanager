@@ -62,7 +62,7 @@ class WorkflowActionGenericQueueAdapter(WorkflowActionGenericAdapter):
 
         do_queue = True
         # samples folder
-        if self.context.portal_type == "Samples":
+        if self.context.portal_type in ["Samples", "Client", "Batch"]:
             samples_analyses = ploneapi.portal.get_registry_record(
                 "senaite.queue.samples_analyses"
             )
