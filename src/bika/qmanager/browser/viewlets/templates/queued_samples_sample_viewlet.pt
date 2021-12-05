@@ -1,3 +1,4 @@
+<!--
 <div tal:omit-tag=""
      tal:define="num_analyses python:view.get_num_analyses_pending();
                  num_samples python:view.get_num_samples_pending();
@@ -36,3 +37,4 @@
     </div>
   </div>
 </div>
+-->
