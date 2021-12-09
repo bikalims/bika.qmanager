@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import json
-import six
 import base64
+import json
+
+import six
+from ZPublisher.HTTPRequest import record
+from bika.lims import api
+from bika.lims import bikaMessageFactory as _
+from bika.lims.browser.analysisrequest.add2 import \
+    ajaxAnalysisRequestAddView as aARAV
+from bika.lims.interfaces import IAddSampleRecordsValidator
 from plone import api as ploneapi
+from senaite.queue import api as q_api
 from zope.component import getAdapters
 from zope.interface import implements
 from zope.publisher.interfaces import IPublishTraverse
-
-from bika.lims import api
-from bika.lims import bikaMessageFactory as _
-from bika.lims.browser.analysisrequest.add2 import ajaxAnalysisRequestAddView as aARAV
-from bika.lims.interfaces import IAddSampleRecordsValidator
-from senaite.queue import api as q_api
 
 
 class ajaxAnalysisRequestAddView(aARAV):
@@ -45,7 +47,8 @@ class ajaxAnalysisRequestAddView(aARAV):
         # Validate required fields
         for n, record in enumerate(records):
 
-            # Process textfield fields first and set their values to the linked field
+            # Process textfield fields first and set their values to the
+            # linked field
             # NOTE: Quickfix for RejectionReasons.textfield
             text_fields = filter(lambda f: f.endswith(".textfield"), record)
             for field in text_fields:
@@ -70,7 +73,8 @@ class ajaxAnalysisRequestAddView(aARAV):
             attachments[n] = map(lambda f: record.pop(f), file_fields)
 
             # Required fields and their values
-            required_keys = [field.getName() for field in fields if field.required]
+            required_keys = [field.getName() for field in fields if
+                             field.required]
             required_values = [record.get(key) for key in required_keys]
             required_fields = dict(zip(required_keys, required_values))
 
@@ -165,6 +169,24 @@ class ajaxAnalysisRequestAddView(aARAV):
         if samples_analyses > count:
             return super(ajaxAnalysisRequestAddView, self).ajax_submit()
 
-        params = {"records": valid_records}
+        params = {"records": [records_to_dicts(r) for r in valid_records]}
+
         q_api.add_task("bika.qmanager.create_ars", self.context, **params)
         return {"success": ""}
+
+
+def records_to_dicts(r):
+    if hasattr(r, 'items'):
+        for k, v in r.items():
+            # record values to dicts
+            if isinstance(v, record):
+                v = dict(v)
+                r[k] = records_to_dicts(v)  # recurse
+            # list item record values to dicts
+            elif isinstance(v, (tuple, list)):
+                new = [dict(**_) if isinstance(_, record) else _ for _ in v]
+                r[k] = new
+            elif isinstance(v, dict):
+                # plain dict values
+                r[k] = records_to_dicts(v)  # recurse
+    return r
