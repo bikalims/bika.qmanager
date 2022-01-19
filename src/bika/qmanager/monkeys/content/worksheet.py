@@ -18,24 +18,25 @@
 # Copyright 2019-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from plone import api as ploneapi
-from senaite.queue import api
-from senaite.queue import logger
-
 from bika.lims import api as _api
-from bika.lims.catalog import CATALOG_ANALYSIS_LISTING
 from bika.lims.interfaces.analysis import IRequestAnalysis
+from plone import api as ploneapi
+from plone.api.exc import InvalidParameterError
+from senaite.queue import api
 
 
 def addAnalyses(self, analyses):  # noqa non-lowercase func name
     """Adds a collection of analyses to the Worksheet at once
     """
     to_queue = list()
-    queue_enabled = api.is_queue_ready("task_assign_analyses")
-    worksheet_analyses = ploneapi.portal.get_registry_record(
-        "senaite.queue.worksheet_analyses"
-    )
-    if worksheet_analyses > len(analyses):
+    try:
+        queue_enabled = api.is_queue_ready("task_assign_analyses")
+        worksheet_analyses = ploneapi.portal.get_registry_record(
+            "senaite.queue.worksheet_analyses"
+        )
+        if worksheet_analyses > len(analyses):
+            queue_enabled = False
+    except InvalidParameterError:
         queue_enabled = False
 
     for num, analysis in enumerate(analyses):

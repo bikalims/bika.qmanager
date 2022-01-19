@@ -25,7 +25,6 @@
       name="ajax_publish"
       class="bika.qmanager.ajax.AjaxPublishView"
       permission="zope.Public"
-      layer="bika.coa.interfaces.IBikaCOALayer"
-      />
+      layer="bika.qmanager.interfaces.IBikaQmanagerLayer" />
 
 </configure>

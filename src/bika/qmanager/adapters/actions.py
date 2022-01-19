@@ -73,7 +73,6 @@ class WorkflowActionGenericQueueAdapter(WorkflowActionGenericAdapter):
                     action, objects
                 )
 
-
             objs = []
             for obj in objects:
                 analyses = obj.getAnalyses()
