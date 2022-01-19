@@ -3,33 +3,34 @@
 import ast
 import base64
 import json
-import transaction
 
+from senaite.impress.interfaces import IPdfReportStorage
+from senaite.impress.publisher import Publisher
+
+import transaction
 from DateTime import DateTime
 from Products.Archetypes.interfaces.base import IBaseObject
-from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFCore.WorkflowCore import WorkflowException
-from plone import api as ploneapi
-from plone.memoize import view as viewcache
-from plone.namedfile.file import NamedBlobFile
-from zope.interface import implements
-from zope.component import adapts
-from zope.component import getMultiAdapter
-from zope.component import getAdapter
-
+from Products.CMFPlone.utils import _createObjectByType
 from bika.lims import api as bika_api
 from bika.lims import logger
 from bika.lims.utils import tmpID
 from bika.lims.utils.analysisrequest import create_analysisrequest as crar
-
+from plone import api as ploneapi
+from plone.api.exc import InvalidParameterError
+from plone.memoize import view as viewcache
+from plone.namedfile.file import NamedBlobFile
 from senaite.app.supermodel.interfaces import ISuperModel
-from senaite.impress.interfaces import IPdfReportStorage
-from senaite.impress.publisher import Publisher
-
 from senaite.queue import api
 from senaite.queue.adapters.actions import WorkflowActionGenericAdapter
 from senaite.queue.interfaces import IQueuedTaskAdapter
-from senaite.queue.queue import get_chunks, get_chunk_size, get_chunks_for
+from senaite.queue.queue import get_chunk_size
+from senaite.queue.queue import get_chunks
+from senaite.queue.queue import get_chunks_for
+from zope.component import adapts
+from zope.component import getAdapter
+from zope.component import getMultiAdapter
+from zope.interface import implements
 
 
 def get_chunks_for_registration(task, items=None):
@@ -63,9 +64,16 @@ class WorkflowActionGenericQueueAdapter(WorkflowActionGenericAdapter):
         do_queue = True
         # samples folder
         if self.context.portal_type in ["Samples", "Client", "Batch"]:
-            samples_analyses = ploneapi.portal.get_registry_record(
-                "senaite.queue.samples_analyses"
-            )
+            try:
+                samples_analyses = ploneapi.portal.get_registry_record(
+                    "senaite.queue.samples_analyses"
+                )
+            except InvalidParameterError:
+                return super(WorkflowActionGenericQueueAdapter, self).do_action(
+                    action, objects
+                )
+
+
             objs = []
             for obj in objects:
                 analyses = obj.getAnalyses()
@@ -75,9 +83,14 @@ class WorkflowActionGenericQueueAdapter(WorkflowActionGenericAdapter):
 
         # worksheets
         if self.context.portal_type == "Worksheet":
-            worksheet_analyses = ploneapi.portal.get_registry_record(
-                "senaite.queue.worksheet_analyses"
-            )
+            try:
+                worksheet_analyses = ploneapi.portal.get_registry_record(
+                    "senaite.queue.worksheet_analyses"
+                )
+            except InvalidParameterError:
+                return super(WorkflowActionGenericQueueAdapter, self).do_action(
+                    action, objects
+                )
             if worksheet_analyses > len(objects):
                 do_queue = False
         if not do_queue:
@@ -95,7 +108,9 @@ class WorkflowActionGenericQueueAdapter(WorkflowActionGenericAdapter):
             return objects
 
         # Delegate to base do_action
-        return super(WorkflowActionGenericQueueAdapter, self).do_action(action, objects)
+        return super(WorkflowActionGenericQueueAdapter, self).do_action(
+            action, objects
+        )
 
 
 class RegisterQueuedTaskAdapter(object):
