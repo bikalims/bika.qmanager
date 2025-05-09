@@ -34,11 +34,11 @@ Required Components
 -------------------
 1) ``queue_server``
 
-        Responsible for queuing tasks.
+   Responsible for queuing tasks.
 
 2) ``queue_consumer``
 
-         Executes the queued tasks. This can be triggered by: 
+   Executes the queued tasks. This can be triggered by: 
            - A cron job
            - Direct access to the URL: /senaite/queue_consume
 
