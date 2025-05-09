@@ -28,64 +28,26 @@
 bika.qmanager
 =============
 
-Tell me what your product does
+bika.qmanager extends the functionality of `senaite.queue <https://github.com/senaite/senaite.queue>`_. To set it up, follow the documentation provided on the senaite.queue `docs site <https://github.com/senaite/senaite.queue>`_.
 
-Features
---------
+Required Components
+-------------------
+1) ``queue_server``
 
-- Can be bullet points
+        Responsible for queuing tasks.
 
+2) ``queue_consumer``
 
-Examples
---------
-
-This add-on can be seen in action at the following sites:
-- Is there a page on the internet where everybody can see the features?
-
-
-Documentation
--------------
-
-Full documentation for end users can be found in the "docs" folder, and is also available online at http://docs.plone.org/foo/bar
-
-
-Translations
-------------
-
-This product has been translated into
-
-- Klingon (thanks, K'Plai)
-
-
-Installation
-------------
-
-Install bika.qmanager by adding it to your buildout::
-
-    [buildout]
-
-    ...
-
-    eggs =
-        bika.qmanager
-
-
-and then running ``bin/buildout``
+         Executes the queued tasks. This can be triggered by: 
+           - A cron job
+           - Direct access to the URL: /senaite/queue_consume
 
 
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/collective/bika.qmanager/issues
-- Source Code: https://github.com/collective/bika.qmanager
-- Documentation: https://docs.plone.org/foo/bar
-
-
-Support
--------
-
-If you are having issues, please let us know.
-We have a mailing list located at: project@example.com
+- Issue Tracker: https://github.com/bikalims/bika.qmanager/issues
+- Source Code: https://github.com/bikalims/bika.qmanager
 
 
 License
